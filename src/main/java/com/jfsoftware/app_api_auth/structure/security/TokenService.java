@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.jfsoftware.app_api_auth.domain.User;
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -14,16 +14,17 @@ import java.time.ZoneOffset;
 
 @Service
 public class TokenService {
-    @Value("")
+
+    @Value("${api.security.token.secret}")
     private String secret;
     public String generateToken(User user){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             String token = JWT.create()
-                    .withIssuer("login-auth-api")
+                    .withIssuer("app-api-auth")
                     .withSubject(user.getEmail())
-                    .withExpiresAt(this.generateExpirationDate())
+                    .withExpiresAt(this.expirationDate())
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception){
@@ -44,7 +45,7 @@ public class TokenService {
         }
     }
 
-    private Instant generateExpirationDate(){
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-02:00"));
+    private Instant expirationDate(){
+        return LocalDateTime.now().plusHours(8).toInstant(ZoneOffset.of("-02:00"));
     }
 }
